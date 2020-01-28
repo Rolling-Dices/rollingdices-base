@@ -1,23 +1,20 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 require('dotenv/config');
 
+//app
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-mongoose.connect(
-  process.env.MONGO_URL, 
-  {
-    useUnifiedTopology: true, 
-    useNewUrlParser: true, 
-    useCreateIndex: true 
-  }
-);
+//db conection
+const sequelize = require('./src/config/DBConnection.js');
 
+//test route
 app.get('/', (req, res) => {
   return res.send('Rolling Dices');
 });
 
+//server port
 app.listen(3000);
+console.log('Server UP!')
