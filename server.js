@@ -7,7 +7,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+
 app.use('/users', require('./src/routes/UserRoute'));
+app.use('/tables', require('./src/routes/TableRoute'));
 
 app.listen(3333);
 
