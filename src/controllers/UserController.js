@@ -1,6 +1,24 @@
+const { Op } = require("sequelize");
+
 const User = require('../models/User');
 
 module.exports = {
+  async showBySlug(req, res) {
+    const { slug } = req.params;
+
+    console.log(slug)
+
+    const user = await User.findOne({
+      where: {
+        slug: {
+          [Op.eq]: slug
+        }
+      }
+    });
+
+    return res.json(user);
+  },
+  
   async store(req, res) {
     const { username, name, birth_date, email, password, photo} = req.body;
 
@@ -18,4 +36,5 @@ module.exports = {
 
     return res.json({ user });
   },
+
 }
