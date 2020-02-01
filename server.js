@@ -11,7 +11,7 @@ app.use(cors());
 app.use('/users', require('./src/routes/UserRoute'));
 app.use('/tables', require('./src/routes/TableRoute'));
 
-app.listen(3333);
+app.listen(process.env.PORT || 3333);
 
 //yarn sequelize db:create
 //yarn sequelize db:migrate
