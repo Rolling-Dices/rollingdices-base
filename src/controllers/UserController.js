@@ -1,12 +1,10 @@
 const { Op } = require("sequelize");
 
-const User = require('../models/User');
+const User = require("../models/User");
 
 module.exports = {
-  async showBySlug(req, res) {
+  async indexBySlug(req, res) {
     const { slug } = req.params;
-
-    console.log(slug)
 
     const user = await User.findOne({
       where: {
@@ -18,11 +16,15 @@ module.exports = {
 
     return res.json(user);
   },
-  
-  async store(req, res) {
-    const { username, name, birth_date, email, password, photo} = req.body;
 
-    const slug = username.toLowerCase().replace(' ', '-');
+  async store(req, res) {
+    const { username, name, birth_date, email, password, photo } = req.body;
+
+    const slug = username
+      .toLowerCase()
+      .replace(" ", "-")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
 
     const user = await User.create({
       username,
@@ -35,6 +37,5 @@ module.exports = {
     });
 
     return res.json({ user });
-  },
-
-}
+  }
+};
