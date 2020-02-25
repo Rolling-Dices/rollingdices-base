@@ -22,10 +22,12 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      /*
       birth_date: {
         type: Sequelize.DATE,
         allowNull: false
       },
+      */
       email: {
         type: Sequelize.STRING,
         unique: true,
