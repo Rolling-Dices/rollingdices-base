@@ -2,8 +2,6 @@ const { Op } = require("sequelize");
 
 const User = require("../models/User");
 
-const bcryptjs = require('bcryptjs')
-
 module.exports = {
   async indexBySlug(req, res) {
     const { slug } = req.params;
@@ -20,48 +18,48 @@ module.exports = {
   },
 
   async store(req, res) {
+    try {
+      const { username, name, birth_date, email, password, photo } = req.body;
 
-    try{
+      const slug = username
+        .toLowerCase()
+        .replace(" ", "-")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
 
-    const { username, name, birth_date, email, password, photo } = req.body;
+      if (
+        await User.findOne({
+          where: { username }
+        })
+      ) {
+        return res
+          .status(400)
+          .json({ error: "Nome de Usuário já está em uso" });
+      }
 
-    const slug = username
-      .toLowerCase()
-      .replace(" ", "-")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
+      if (
+        await User.findOne({
+          where: { email }
+        })
+      ) {
+        return res.status(400).json({ error: "E-mail já está em uso" });
+      }
 
-    if(await User.findOne({
-      where: {username}
-    })){
-      console.log("username is already being used")
-      return res.status(400).json({msg: 'username is already being used'})
+      const user = await User.create({
+        username,
+        slug,
+        name,
+        birth_date,
+        email,
+        password,
+        photo
+      });
+
+      return res.json({ msg: "Usuário criado", user });
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ error: "Erro interno do servidor", msg: err });
     }
-
-    if(await User.findOne({
-      where: {email}
-    })){
-      console.log("email is already being used")
-      return res.status(400).json({msg: 'email is already being used'})
-    }
-
-    const user = await User.create({
-      username,
-      slug,
-      name,
-      birth_date,
-      email,
-      password,
-      photo
-    });
-
-    return res.json({ msg: 'User created!', user });
-
-  } catch(err){
-    console.log(err)
-    return res.status(400).json({ msg: 'Unexpected error!' })
   }
-
-  }
-
 };

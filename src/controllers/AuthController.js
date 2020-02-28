@@ -1,35 +1,36 @@
 const User = require("../models/User");
 
+const bcryptjs = require("bcryptjs");
+
 module.exports = {
-
   async authenticate(req, res) {
+    try {
+      const { email, password } = req.body;
 
-    try{
+      if (!email && email.trim() == "")
+        return res.status(400).json({ error: "Informe seu e-mail" });
 
-    const { email, password } = req.body
+      if (password && password.trim() == "")
+        return res.status(400).json({ error: "Informe sua senha" });
 
-    if((email == null || email.trim() == '') || (password == null || password.trim() == ''))
-      return res.status(400).json({msg: 'all fields must be filled'})
+      const userAuth = await User.findOne({
+        where: { email }
+      });
 
-    const userAuth = await User.findOne({
-      where: {email}
-    })
+      if (!userAuth)
+        return res.status(400).json({ error: "Usuário não encontrado" });
 
-    if(!userAuth)
-      return res.status(400).json({msg: 'No user found!'})
+      if (!(await bcryptjs.compare(password, userAuth.password)))
+        return res.status(400).send({ error: "Senha inválida" });
 
-    if(!await bcryptjs.compare(password, userAuth.password))
-      return res.status(400).send({msg: 'Invalid password'});
-
-    res.status(200).json({
-      msg:'Login efeutado!',
-      userAuth
-    })
-
-    } catch(err) {
-      console.log(err)
-      return res.status(400).json({ msg: 'Unexpected error!' })
+      res.status(200).json({
+        msg: "Login efeutado!",
+        userAuth
+      });
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ error: "Erro interno do servidor", msg: err });
     }
-
   }
-}
+};
